@@ -1,0 +1,23 @@
+version: "3" # composeファイルのバーション指定
+services:
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+    user: root
+    ports:  
+      - 15432:5432
+    volumes:
+      - .:/workspace/
+      - ./psql_data:/var/lib/postgresql/data
+    privileged: true
+  flask:
+    build:
+      context: ./flask
+      dockerfile: Dockerfile
+    user: root
+    ports:  
+      - 15000:5000
+    volumes:
+      - .:/workspace/
+    privileged: true

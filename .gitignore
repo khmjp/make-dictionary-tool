@@ -1,0 +1,8 @@
+.vscode/
+psql_data/*
+!psql_data/postgresql.conf
+!psql_data/pg_hba.conf
+__pycache__/*
+flask/files/user_dict/*
+backup/*
+.DS_Store

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+       <meta charset="utf-8">
+       <title>webapp</title>
+       <style type="text/css">
+.split{
+    display: table;
+    width: 100%;    
+}
+
+.split-item{
+    display: table-cell;
+    padding: 20px;
+    width: 50%;
+}
+
+.split-left{
+    background: #fff;
+    color: #000;
+}
+
+.form-control{
+    width: 90%;
+    height: 15em;
+    font-size: 12pt;
+}
+
+.form-control#select{
+    width: 90%;
+    height: 2em;
+    font-size: 12pt;
+}
+
+.form-control#dictionary-add{
+    width: 95%;
+    height: 5em;
+    font-size: 12pt;
+}
+
+.transformedData{
+    width: 90%;
+    height: 50％;
+    border:1px solid black;
+    overflow: scroll;
+}
+
+.LatestDictionary{
+    width: 95%;
+    height: 8em;
+    font-size: 12pt;
+    border:1px solid black;
+}
+
+span.hl{
+    /*color: #ff7d6e;*/
+    margin: 3px;
+    background: #ffebe9;
+    border-bottom: solid 3px #ff7d6e;
+}
+      </style>
+   </head>
+    <body>
+      <h1>辞書作成補助ツール</h1>
+      
+      <div class="split">
+        <div class="split-item split-left">
+            <div class="split-left__inner">
+
+              <h2>ニュース記事の選択</h3>
+              <form action="/transformed" method="post">
+              <label>
+                {% if date_str != '' %}
+                <input type="datetime-local" name="date" value="{{ date_str }}" min="2019-04-13T14:00" max="2019-09-30T00:00" autofocus required>
+                {% else %}
+                <input type="datetime-local" name="date" value="2019-04-14T00:00" min="2019-04-13T14:00" max="2019-09-30T00:00" autofocus required>
+                {% endif %}
+                <button type="submit" class="btn btn-default" value="date">ニュースID一覧の取得</button>
+              </label>
+              </form>
+
+              <form action="/transformed" method="post">
+                <select name="select" class="form-control select" id="select" required>
+                  {% if storyid_list %}
+                  {%- for o in storyid_list -%}
+                  {%- if o == storyid -%}
+                  <option value="{{ o }}" selected>{{ o }}</option>
+                  {%- else -%}
+                  <option value="{{ o }}">{{ o }}</option>
+                  {%- endif -%}
+                  {%- endfor -%}
+                  {% endif %}
+                </select>
+                <button type="submit" class="btn btn-default" value="select">対象ニュースIDの形態素解析を実行</button>
+              </form>
+        
+              <h2>ニュース記事の形態素解析</h3>
+              <div class="transformedData">
+                {%- if transformedData %}{{transformedData | safe}}{% endif -%}
+              </div>
+              
+
+          </div><!--split-left__inner-->
+        </div><!--split-item split-left-->
+
+        <div class="split-item split-right">
+            <div class="split-right__inner">
+
+              <h2>辞書への単語登録</h2>
+              <form action="/transformed" method="post">
+                登録単語：　　　　<input type="text" class="text" name="word" value="{% if new_word %}{{new_word.word}}{% endif %}" size="20" maxlength="20" required/><br/>
+                読み（カタカナ）：<input type="text" class="text" name="yomi" value="{% if new_wordyomi %}{{new_word.yomi}}{% endif %}"  size="20" maxlength="20" required/><br/>
+                名詞種別：<br/>
+                <input type="radio" class="radio" name="dictionary" value="noun_general" {% if new_word.noun_type == "noun_general" %}checked{% endif %} required>5146 普通名詞,一般</input><br/>
+                <input type="radio" class="radio" name="dictionary" value="noun_sahen" {% if new_word.noun_type=='noun_sahen' %}checked{% endif %}>5133 普通名詞,サ変可能</input><br/>
+                <input type="radio" class="radio" name="dictionary" value="propn_general" {% if new_word.noun_type=='propn_general' %}checked{% endif %}>4786 固有名詞,一般</input><br/>
+                <input type="radio" class="radio" name="dictionary" value="propn_last" {% if new_word.noun_type=='propn_last' %}checked{% endif %}>4789 固有名詞,人名,名</input><br/>
+                <input type="radio" class="radio" name="dictionary" value="propn_family" {% if new_word.noun_type=='propn_family' %}checked{% endif %}>4790 固有名詞,人名,姓</input><br/>
+                <br/>
+                <button type="submit" class="btn btn-default" name="retransform">形態素解析を再実行</button>
+                <button type="submit" class="btn btn-default" name="entry">辞書に登録</button>
+              </form>
+
+              <h2>直近の辞書登録内容</h2>
+              <textarea class="LatestDictionary" readonly>{% if dictionaryData %}{{dictionaryData}}{% endif %}</textarea>
+                <form action="/download" method="get">
+                  <button type="submit" class="btn btn-default" value="download">辞書のダウンロード</button>
+              </form>
+
+
+            </div><!--split-right__inner-->
+        </div><!--split-item split-right-->
+    </div><!--split-->
+
+    </body>
