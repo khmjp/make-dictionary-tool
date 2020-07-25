@@ -109,13 +109,13 @@ span.hl{
               <h2>辞書への単語登録</h2>
               <form action="/transformed" method="post">
                 登録単語：　　　　<input type="text" class="text" name="word" value="{% if new_word %}{{new_word.word}}{% endif %}" size="20" maxlength="20" required/><br/>
-                読み（カタカナ）：<input type="text" class="text" name="yomi" value="{% if new_wordyomi %}{{new_word.yomi}}{% endif %}"  size="20" maxlength="20" required/><br/>
+                読み（カタカナ）：<input type="text" class="text" name="yomi" value="{% if new_word %}{{new_word.yomi}}{% endif %}"  size="20" maxlength="20" required/><br/>
                 名詞種別：<br/>
-                <input type="radio" class="radio" name="dictionary" value="noun_general" {% if new_word.noun_type == "noun_general" %}checked{% endif %} required>5146 普通名詞,一般</input><br/>
-                <input type="radio" class="radio" name="dictionary" value="noun_sahen" {% if new_word.noun_type=='noun_sahen' %}checked{% endif %}>5133 普通名詞,サ変可能</input><br/>
-                <input type="radio" class="radio" name="dictionary" value="propn_general" {% if new_word.noun_type=='propn_general' %}checked{% endif %}>4786 固有名詞,一般</input><br/>
-                <input type="radio" class="radio" name="dictionary" value="propn_last" {% if new_word.noun_type=='propn_last' %}checked{% endif %}>4789 固有名詞,人名,名</input><br/>
-                <input type="radio" class="radio" name="dictionary" value="propn_family" {% if new_word.noun_type=='propn_family' %}checked{% endif %}>4790 固有名詞,人名,姓</input><br/>
+                <input type="radio" class="radio" name="dictionary" value="noun_general" {% if new_word and new_word.noun_type == "noun_general" %}checked{% endif %} required>5146 普通名詞,一般</input><br/>
+                <input type="radio" class="radio" name="dictionary" value="noun_sahen" {% if new_word and new_word.noun_type == 'noun_sahen' %}checked{% endif %}>5133 普通名詞,サ変可能</input><br/>
+                <input type="radio" class="radio" name="dictionary" value="propn_general" {% if new_word and new_word.noun_type == 'propn_general' %}checked{% endif %}>4786 固有名詞,一般</input><br/>
+                <input type="radio" class="radio" name="dictionary" value="propn_last" {% if new_word and new_word.noun_type == 'propn_last' %}checked{% endif %}>4789 固有名詞,人名,名</input><br/>
+                <input type="radio" class="radio" name="dictionary" value="propn_family" {% if new_word and new_word.noun_type == 'propn_family' %}checked{% endif %}>4790 固有名詞,人名,姓</input><br/>
                 <br/>
                 <button type="submit" class="btn btn-default" name="retransform">形態素解析を再実行</button>
                 <button type="submit" class="btn btn-default" name="entry">辞書に登録</button>
