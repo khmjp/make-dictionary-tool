@@ -3,9 +3,9 @@
 ## 概要
 
 自然言語処理において、日本語の形態素解析器として
-[Sudachi](https://github.com/WorksApplications/Sudachi#sudachi-日本語readme)など大変便利な物がありますが、特定のニッチな分野に対しては独自に単語登録をしたいことがあり、さほどITに詳しくない人でも操作できるようなツールを作成しました。
+[Sudachi](https://github.com/WorksApplications/Sudachi#sudachi-日本語readme)など大変便利な物があります。しかし、ニッチな分野に対しては独自に辞書を作成した方が良いことがあり、さほどITに詳しくない人でも操作できるようなツールを作成しました。
 
-ニュース等の文章を形態素解析して、その結果を確認しながら、うまく分割されていない単語（名詞）に対して、辞書を作成することができます。
+ニュース等の文章を形態素解析して、その結果を確認しながら、うまく分割されていない単語（名詞）に対して辞書を作成することができます。
 
 - 全体画面
   - 大きく4つに分かれています。
@@ -19,9 +19,9 @@
 - 形態素解析した文の表示(例)
   - 名詞と識別された単語は、わかりやすく色付けされます。
 
-![形態素解析した文](README_img/capture_text.png)
+    ![形態素解析した文](README_img/capture_text.png)
 
-- ユーザ辞書そのものはCSV形式ですが、直接CSVファイルを編集するとオペレーションミスが発生しやすく、正しく辞書登録されない上に、誤り自体に気付きにくいため、「単語・読み・名詞種別」の最低限、必要な項目のみを入力する形としています。
+- ユーザ辞書そのものはCSV形式ですが、直接CSVファイルを編集するとオペレーションミスが発生しやすいです。ミスがあると、登録したつもりであるにも関わらず、正しく辞書登録されない状態となってしまうため、「単語・読み・名詞種別」の最低限、必要な項目のみを入力する形としています。
 
 ## 辞書作成の作業の流れ
 1. ニュース記事の選択
@@ -48,8 +48,8 @@
 - オープンソース日本語NLPライブラリの[GINZA](https**://megagonlabs.github.io/ginza/)を使用しています。
 - ユーザ辞書作成方法の詳細は[Sudachi ユーザー辞書作成方法](https://github.com/WorksApplications/Sudachi/blob/develop/docs/user_dict.md)を参照してください。
 - WEBフレームワークは Flask を採用し、シンプルで小規模な構成です。
-- DBは PostgreSQL を採用し、python からは psycopg2 でシンプルにアクセスしています。
-- Flask と PostgreSQL の２つがコンテナとして起動します。両コンテナともDocker-Composeにより管理します。
+- DBは PostgreSQL を採用し、python からは psycopg2 を使用してシンプルにアクセスしています。
+- 上記の Flask と PostgreSQL はいずれもコンテナとしてします。両コンテナともDocker-Composeにより管理します。
 - ブラウザでの見え方は Mac (10.15.6) の Chrome (ver.83) にて確認しています。
 
 - ソフトウェアバージョン
@@ -65,9 +65,29 @@
 
 
 ## デプロイ方法
-- ニュースデータはDBに保持しますが、各自で用意する必要があります。
-  - 例えば、[livedoor ニュースコーパス](http://www.rondhuit.com/download.html#ldcc)などが公開されており、とても便利です。
+### 事前準備（DB）
+- ニュースデータはDBに保持しますが、各自で用意する必要があります。（ライセンスの関係で本レポジトリにはデータを含めることができませんでした。）
+  - 例えば、[livedoor ニュースコーパス](http://www.rondhuit.com/download.html#ldcc)などが公開されており、とても便利です。（感謝）
   - ```psql_data```ディレクトリ（```PG_DATA```）にDBデータを構築します。postgresコンテナは```Volume```設定により、この領域を共有します。
+
+- DBのテーブルスキーマは以下を前提としています。
+  - ```news``` データベース
+  - ```readonly_user``` ユーザ
+  - ```news01``` テーブル
+  ```sql
+  CREATE TABLE news01 (
+      versionCreated timestamp with time zone,
+      storyId varchar(255),
+      story text,
+      primary key(storyId)
+  ) ;
+  ```
+
+- flask側からは以下のようにアクセスしています。
+  ```python:webapp.py(l.217)
+              # get news from DB
+              db_config = DBConfig(table='news01', user='readonly_user',  database='news')
+  ```
 
 - postgresql設定ファイルは最低限、以下の設定が必要です。
   - postgres.conf
@@ -82,6 +102,9 @@
   host    all             all             0.0.0.0/  0               trust
   ```
 
+
+
+### 起動＿停止方法
 - docker-composeで起動します。
   ```
   # git cloneしたディレクトリに移動
@@ -91,6 +114,12 @@
   # コンテナ起動確認
   docker-compose ps
   ```
-  chrome等のブラウザで ```localhost:15000``` にアクセスします。
-  （ポート番号は、```docker-compose.yml``` 内で指定しています。）
+  chrome等のブラウザで ```localhost:15000``` （ローカルホスト上で起動している場合）にアクセスします。
+  
+  ポート番号は、```docker-compose.yml``` 内で指定しています。必要に応じて変更してください。
 
+- docker-composeで停止します。
+  ```
+  # コンテナ停止
+  docker-compose down
+  ```
