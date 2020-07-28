@@ -1,7 +1,16 @@
 #!/usr/bin/python3
-from flask import Flask, render_template, url_for, request, send_file
+from flask import Flask, render_template, url_for, request, send_file, flash, redirect
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+# upload config
+# limit upload file size : 10MB
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+# secret key for dev
+app.config["SECRET_KEY"] = "dicttool"
+# file extensions
+ALLOWED_EXTENSIONS = set(['csv'])
 
 #-------------------
 #-- global variables
@@ -178,6 +187,13 @@ def restoreDictionary(dictionary_path=dictionary_path):
     compileDictionary(dictionary_path)
     return
 
+def allwed_file(filename):
+    '''
+    check if dot(.) exist and filename has ALLOWED_EXTENSIONS
+    '''
+    return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
 #-------------------
 #-- routing
 #-------------------
@@ -287,6 +303,33 @@ def transformed():
 @app.route('/download', methods=['GET'])
 def download_file():
     return send_file('./user_dict/dict.csv', as_attachment=True)
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    # check if upload file exist
+    if 'file' not in request.files:
+        msg = 'アップロードするファイルが指定されていません。'
+        flash(msg, 'fail')
+    else:
+        # read data
+        file = request.files['file']
+        # check if upload file name exist
+        if file.filename == '':
+            msg = 'アップロードするファイルが指定されていません。'
+            flash(msg, 'fail')
+        # check filename and save it
+        if file and allwed_file(file.filename):
+            # sanitize
+            filename = secure_filename(file.filename)
+            # save file
+            file.save(dictionary_path)
+            msg = 'アップロードが完了しました。'
+            flash(msg, 'success')
+        else:
+            msg = 'CSV拡張子のみが許可されています。'
+            flash(msg, 'fail')
+    return redirect(url_for('transformed'))
+
 
 #-------------------
 #-- main

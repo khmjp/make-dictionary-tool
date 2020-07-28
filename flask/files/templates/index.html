@@ -123,10 +123,23 @@ span.hl{
 
               <h2>直近の辞書登録内容</h2>
               <textarea class="LatestDictionary" readonly>{% if dictionaryData %}{{dictionaryData}}{% endif %}</textarea>
-                <form action="/download" method="get">
-                  <button type="submit" class="btn btn-default" value="download">辞書のダウンロード</button>
+              <form action="/download" method="get">
+                <button type="submit" class="btn btn-default" value="download">辞書のダウンロード</button>
               </form>
-
+              
+              <p>既存辞書のアップロード</p>
+              <form action="/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".csv"/>
+                <input type="submit" value="辞書のアップロード"/>
+              </form>
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <p class=flashes {{ category }}>{{ message }}</p>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              <p>{% if upload %}{{upload}}{% endif %}</p>
 
             </div><!--split-right__inner-->
         </div><!--split-item split-right-->
