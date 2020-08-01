@@ -103,6 +103,18 @@
   ```
 
 
+### docker および docker-composeをインストール（[公式手順](https://docs.docker.com/compose/install/)）
+以下は　AWS EC2上に配置する場合の例です。
+```
+$ yum install docker -y
+$ sudo systemctl start docker
+$ sudo systemctl enable docker
+$ sudo usermod -a -G docker ec2-user 
+# 一度、ログアウトして入り直す。
+
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+$ sudo chmod +x /usr/local/bin/docker-compose
+```
 
 ### 起動＿停止方法
 - docker-composeで起動します。
